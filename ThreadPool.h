@@ -8,6 +8,7 @@ class ThreadPool : public NonCopyable
     condition_variable m_conditional_lock;
     mutex m_conditional_mutex;
     bool m_shutdown;
+    vector<thread> m_threads;
 
     class ThreadWorker : public NonCopyable
     {
@@ -24,11 +25,11 @@ class ThreadPool : public NonCopyable
 
   public:
     template <typename F, typename... Args>
-    auto submit(F &&f, Args &&...args) -> future<decltype(forward<F>(f)(forward<Args>(args)...))>
+    auto submit(F &&f, Args &&...args) -> future<decltype(std::forward<F>(f)(std::forward<Args>(args)...))>
     {
-        using return_type = decltype(forward<F>(f)(forward<Args>(args)...));
+        using return_type = decltype(std::forward<F>(f)(std::forward<Args>(args)...));
 
-        function<return_type()> func = bind(forward<F>(f), forward<Args>(args)...);
+        function<return_type()> func = bind(std::forward<F>(f), std::forward<Args>(args)...);
         shared_ptr<packaged_task<return_type()>> task_ptr = make_shared<packaged_task<return_type()>>(func);
 
         function<void()> wrapper_func = [task_ptr]() { (*task_ptr)(); };
@@ -38,5 +39,11 @@ class ThreadPool : public NonCopyable
         return task_ptr->get_future();
     }
 
+    ThreadPool(const int n_threads = 4);
+    void init();
+    void shutdown();
     ~ThreadPool();
+
+    ThreadPool(ThreadPool &&) = delete;
+    ThreadPool &operator=(ThreadPool &&) = delete;
 };

@@ -10,12 +10,15 @@
 #include <mutex>
 #include <queue>
 #include <thread>
+#include <unistd.h>
 #include <unordered_map>
 #include <vector>
 using namespace std;
 
+#define USELOG 1
+
 // for likely compatibility
-#ifdef __GNUC__ || __clang__
+#ifdef __GNUC__
 
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x) __builtin_expect(!!(x), 0)
@@ -41,23 +44,33 @@ class NonCopyable
 
 enum LOGLEVEL
 {
+    NONE,
     INFO,
     WARN,
     ERROR
 };
 
-inline void poollog(const string &msg, const LOGLEVEL level)
+inline void poollog(const std::string &msg, const LOGLEVEL level)
 {
+    if (!USELOG)
+        return;
+
+    std::string line;
     switch (level)
     {
+    case NONE:
+        line = msg + "\n";
+        break;
     case INFO:
-        cerr << "\x1b[32;1;4m[INFO] " << msg << "\x1b[0m\n";
+        line = "\x1b[32;1;4m[INFO]\x1b[0m " + msg + "\n";
         break;
     case WARN:
-        cerr << "\x1b[33;1;4m[WARN] " << msg << "\x1b[0m\n";
+        line = "\x1b[33;1;4m[WARN]\x1b[0m " + msg + "\n";
         break;
     default:
-        cerr << "\x1b[31;1;4m[ERROR] " << msg << "\x1b[0m\n";
+        line = "\x1b[31;1;4m[ERROR]\x1b[0m " + msg + "\n";
         break;
     }
+
+    write(STDERR_FILENO, line.data(), line.size());
 }
