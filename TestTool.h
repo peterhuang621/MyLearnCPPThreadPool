@@ -1,7 +1,7 @@
 #pragma once
 #include "common.h"
-#include <format>
 #include <random>
+#include <sstream>
 
 using namespace std;
 
@@ -21,23 +21,24 @@ void multiply(const int a, const int b)
 {
     simulate_hard_computation();
     const int res = a * b;
-    string s = format("multiply: {} * {} = {}", a, b, res);
-    poollog(s, NONE);
+    stringstream ss;
+    ss << "multiply: " << a << " * " << b << " = " << res;
+    poollog(ss.str(), NONE);
 }
 
 void multiply_output(int &out, const int a, const int b)
 {
-    simulate_hard_computation();
     out = a * b;
-    string s = format("multiply_output: {} * {} = {}", a, b, out);
-    poollog(s, NONE);
+    stringstream ss;
+    ss << "multiply_output: " << a << " * " << b << " = " << out;
+    poollog(ss.str(), NONE);
 }
 
 int multiply_return(const int a, const int b)
 {
-    simulate_hard_computation();
     const int res = a * b;
-    string s = format("multiply_return: {} * {} = {}", a, b, res);
-    poollog(s, NONE);
+    stringstream ss;
+    ss << "multiply_return: " << a << " * " << b << " = " << res;
+    poollog(ss.str(), NONE);
     return res;
 }

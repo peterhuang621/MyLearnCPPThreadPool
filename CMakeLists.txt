@@ -18,3 +18,18 @@ set_target_properties(main PROPERTIES
 )
 
 # message(STATUS "CMAKE_SOURCE_DIR = ${CMAKE_SOURCE_DIR}")
+
+# for iouring test on Linux system
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "Detected Linux system: ${CMAKE_CXX_COMPILER_ID}")
+
+    add_executable(io_uring_test iouring/io_uring_test.cpp)
+
+    target_link_libraries(io_uring_test uring)
+
+    set_target_properties(io_uring_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/iouring"
+    )
+else()
+    message(WARNING "Not on Linux. Skipping io_uring_test (io_uring is Linux-only).")
+endif()
