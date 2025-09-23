@@ -24,10 +24,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Detected Linux system: ${CMAKE_CXX_COMPILER_ID}")
 
     add_executable(io_uring_test iouring/io_uring_test.cpp)
+    add_executable(echo_server iouring/echo_server.cpp)
 
     target_link_libraries(io_uring_test uring)
+    target_link_libraries(echo_server uring)
 
     set_target_properties(io_uring_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/iouring"
+    )
+    set_target_properties(echo_server PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/iouring"
     )
 else()
